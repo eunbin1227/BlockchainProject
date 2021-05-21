@@ -23,10 +23,24 @@ interface ERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     
     event Approval(address indexed owner, address indexed spender, uint256 value);
+    
+    function check_in(uint256 _identifier, uint256 _starting_time) external;
+    
+    function check_out(uint256 _identifier, uint256 _starting_time) external;
+
+    function check_remain() external;
+    
+    function check_available() external;
+    
+    function check_bill() external;
+    
+    function pay() external;
+    
+    function get_info() external;
 }
  
- 
-contract Service is ERC20{
+
+contract Service {
 
     mapping (uint256 => uint256) customer; //identifier -> starting time
     mapping (address => uint256) private _balances;
