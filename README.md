@@ -4,8 +4,9 @@
 
 강은빈, 김한곤, 추연욱
 ### Changes
+
 5/24(Hangon): _paybill()수정, event 추가
----
+
 ### Solidity Ver. 0.8.0
 ---
 This project was bootstrapped with [Create Solidity Project](https://github.com/zemse/create-solidity-project/).
