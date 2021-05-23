@@ -174,11 +174,6 @@ contract Service {
         emit Approval(owner, spender, amount);
     }
     
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-
-    
     function check_in(uint256 identifier, uint256 starting_time, address addr) public {
         // add customer to customer list
         // check_remain(), check_available() then add to customer list
@@ -187,6 +182,7 @@ contract Service {
             getCar[identifier] = Car(identifier, starting_time); 
             _current_car_list.push(Car(identifier, starting_time));
             _stock_number--;
+            emit Checkin(identifier, starting_time);
         } 
     }
     
@@ -200,6 +196,7 @@ contract Service {
                 }
             }
             _stock_number++;
+            emit Checkout(identifier, end_time);
         }
     }
 
@@ -218,7 +215,14 @@ contract Service {
     function _check_bill(uint256 starting_time, uint256 end_time) internal view returns (uint256) {
         // check the amount of fee that has to be payed
         // return price
-        return _fee*(end_time - starting_time);
+        // fee per minute
+        // e.g. Starting, End time: 08:00 -> 0800, 17:24 -> 1724
+        time = end_time - starting_time;
+        if (time-time/100>=60) {
+            time = time+40;
+        }
+        min_time = 60*(time/100)+(time-time/100);
+        return _fee*min_time;
     }
     
     function pay(uint256 identifier, uint256 starting_time, uint256 end_time) public returns (bool){
@@ -232,4 +236,12 @@ contract Service {
         return (_name, _location, _available_hour_start, _available_hour_end, _fee);
     }
     
+    
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+    
+    event Checkin(uint256 lender, uint256 time);
+    
+    event Checkout(uint256 lender, uint256 time);
 }
