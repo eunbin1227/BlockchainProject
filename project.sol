@@ -7,37 +7,37 @@ pragma solidity ^0.8.0;
  * Contributes: Eunbin Kang, Hangon Kim, Yeonok Chu
  */
  
-interface ERC20 {
-    function totalSupply() external view returns (uint256);
+// interface ERC20 {
+//     function totalSupply() external view returns (uint256);
     
-    function balanceOf(address account) external view returns (uint256);
+//     function balanceOf(address account) external view returns (uint256);
 
-    function transfer(address recipient, uint256 amount) external returns (bool);
+//     function transfer(address recipient, uint256 amount) external returns (bool);
 
-    function allowance(address owner, address spender) external view returns (uint256);
+//     function allowance(address owner, address spender) external view returns (uint256);
 
-    function approve(address spender, uint256 amount) external returns (bool);
+//     function approve(address spender, uint256 amount) external returns (bool);
 
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+//     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
-    event Transfer(address indexed from, address indexed to, uint256 value);
+//     event Transfer(address indexed from, address indexed to, uint256 value);
     
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+//     event Approval(address indexed owner, address indexed spender, uint256 value);
     
-    function check_in(uint256 _identifier, uint256 _starting_time) external;
+//     function check_in(uint256 _identifier, uint256 _starting_time) external;
     
-    function check_out(uint256 _identifier, uint256 _starting_time) external;
+//     function check_out(uint256 _identifier, uint256 _starting_time) external;
 
-    function check_remain() external;
+//     function check_remain() external;
     
-    function check_available() external;
+//     function check_available() external;
     
-    function check_bill() external;
+//     function check_bill() external;
     
-    function pay() external;
+//     function pay() external;
     
-    function get_info() external;
-}
+//     function get_info() external;
+// }
  
 
 contract Service {
@@ -45,6 +45,8 @@ contract Service {
     mapping (uint256 => uint256) customer; //identifier -> starting time
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
+    mapping (uint256 => address) private getAddress;
+    mapping (uint256 => Car) private getCar;
 
     uint256 private _totalSupply = 2100000000;
     string private _name;
@@ -56,6 +58,13 @@ contract Service {
     uint256 private _fee;
     uint256 private _available_hour_start;
     uint256 private _available_hour_end;
+    
+    struct Car {
+        uint256 identifier;
+        uint256 starting_time;
+    }
+    
+    Car[] _current_car_list;
     
   
     constructor (string memory name_, 
@@ -81,9 +90,7 @@ contract Service {
             emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
-    /*
-    @dev
-    */
+    
     function name() public view returns (string memory) {
         return _name;
     }
@@ -96,7 +103,6 @@ contract Service {
         return 2;
     }
 
-   
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
@@ -173,38 +179,57 @@ contract Service {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     
-    function check_in(uint256 _identifier, uint256 _starting_time) public {
+    function check_in(uint256 identifier, uint256 starting_time, address addr) public {
         // add customer to customer list
         // check_remain(), check_available() then add to customer list
+        if ((_check_remain() > 0) && _check_available(starting_time)) {
+            getAddress[identifier] = addr;
+            getCar[identifier] = Car(identifier, starting_time); 
+            _current_car_list.push(Car(identifier, starting_time));
+            _stock_number--;
+        } 
     }
     
-    function check_out(uint256 _identifier, uint256 _starting_time) public {
+    function check_out(uint256 identifier, uint256 end_time) public {
         // remove customer to customer list
         // check_bill(), pay() then remove from customer list
+        if(pay(identifier, getCar[identifier].starting_time, end_time)) {
+            for(uint i=0; i<_current_car_list.length; i++) {
+                if(_current_car_list[i].identifier == identifier) {
+                    delete _current_car_list[i];
+                }
+            }
+            _stock_number++;
+        }
     }
 
-    function check_remain() public {
+    function _check_remain() internal view returns (uint256) {
         // check remain space
         // return # of remain space
+        return _stock_number;
     }
     
-    function check_available() public {
+    function _check_available(uint256 time) internal view returns (bool){
         // check if starting time is in available hour
         // return true or false
+        return ((time >= _available_hour_start) && (time <= _available_hour_end));
     }
     
-    function check_bill() public {
+    function _check_bill(uint256 starting_time, uint256 end_time) internal view returns (uint256) {
         // check the amount of fee that has to be payed
         // return price
+        return _fee*(end_time - starting_time);
     }
     
-    function pay() public {
+    function pay(uint256 identifier, uint256 starting_time, uint256 end_time) public returns (bool){
         // pay for the price
         // return true or false
+        return transfer(getAddress[identifier], _check_bill(starting_time, end_time));
     }
     
-    function get_info() public {
+    function get_info() public view returns (string memory, string memory, uint256, uint256, uint256) {
         // return name, location, available hour, fee
+        return (_name, _location, _available_hour_start, _available_hour_end, _fee);
     }
     
 }
