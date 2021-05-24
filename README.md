@@ -6,6 +6,7 @@
 ### Changes
 
 5/24(Hangon): _paybill()수정, event 추가
+
 5/24(Eunbin): _pay_bill 관련 오류 수정
 
 ### Solidity Ver. 0.8.0
