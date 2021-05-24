@@ -217,11 +217,19 @@ contract Service {
         // return price
         // fee per minute
         // e.g. Starting, End time: 08:00 -> 0800, 17:24 -> 1724
+<<<<<<< HEAD
         uint256 time = end_time - starting_time;
         if (time-time/100>=60) {
             time = time+40;
         }
         uint256 min_time = 60*(time/100)+(time-time/100);
+=======
+        time = end_time - starting_time;
+        if (time-time/100>=60) {
+            time = time+40;
+        }
+        min_time = 60*(time/100)+(time-time/100);
+>>>>>>> 1173a9aea9a3a4b789d763215b81cdb40553c8c7
         return _fee*min_time;
     }
     
