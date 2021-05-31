@@ -9,6 +9,8 @@
 
 5/24(Eunbin): _pay_bill 관련 오류 수정
 
+5/31(Hangon): smart contract 새로 작성, project_alt.sol (배포 테스트는 yet)
+
 ### Solidity Ver. 0.8.0
 
 ---
