@@ -13,6 +13,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import {login} from './Api'
+import SignUp from "./SignUp";
+import {Link as RouterLink} from "react-router-dom";
+import {Popover} from "@material-ui/core";
 const LOGIN_KEY = 'LOGIN_KEY';
 
 const useStyles = makeStyles((theme) => ({
@@ -45,6 +48,19 @@ export default function SignIn() {
         const { key } = await login(id, password);
         localStorage.setItem(LOGIN_KEY, key);
     }
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+    const ids = open ? 'simple-popover' : undefined;
 
     return (
         <Container component="main" maxWidth="xs">
@@ -99,8 +115,11 @@ export default function SignIn() {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link href="/SignUp" variant="body2">
+                            <Link onClick={handleClick} variant="body2">
                                 {"Don't have an account? Sign Up"}
+                                <Popover id = {ids} open={open} anchorEl={anchorEl} onClose={handleClose}>
+                                    <SignUp />
+                                </Popover>
                             </Link>
                         </Grid>
                     </Grid>
