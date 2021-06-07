@@ -2,7 +2,6 @@ import {Card, Popover} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import StickyFooter from "./StickyFooter";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import {Link} from 'react-router-dom';
 
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Typography from "@material-ui/core/Typography";
@@ -26,11 +25,11 @@ export default function Main() {
     const [id, setId] = useState();
     const [password, setPassword] = useState();
 
-    const handleSubmit = async e => {
-        e.preventDefault();
-        const { key } = await login(id, password);
-        localStorage.setItem(LOGIN_KEY, key);
-    }
+    // const handleSubmit = async e => {
+    //     e.preventDefault();
+    //     const { key } = await login(id, password);
+    //     localStorage.setItem(LOGIN_KEY, key);
+    // }
 
     const [anchorEl, setAnchorEl] = React.useState(null);
 

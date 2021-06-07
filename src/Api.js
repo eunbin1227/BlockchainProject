@@ -20,14 +20,14 @@ const post = async (url, body={}, extraHeaders={}) => {
     return await res.json();
 }
 
-const get = async (url, query={}, extraHeaders={}) => {
-    const res = await fetch(`${url}`, {
-        method: 'GET',
-        headers: {...getDefaultHeaders(), ...extraHeaders}
-    });
-
-    return await res.json();
-}
+// const get = async (url, query={}, extraHeaders={}) => {
+//     const res = await fetch(`${url}`, {
+//         method: 'GET',
+//         headers: {...getDefaultHeaders(), ...extraHeaders}
+//     });
+//
+//     return await res.json();
+// }
 
 const login = async (name, password) => {
     return await post('login', {name, password});

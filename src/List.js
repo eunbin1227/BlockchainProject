@@ -65,7 +65,7 @@ export default function List() {
                             <div className={classes.section1}>
                                 <Grid container alignItems="center">
                                     <Grid item xs>
-                                        <Typography gutterBottom variant="h4">
+                                        <Typography gutterBottom variant="h4" component={'span'}>
                                             Stock List
                                         </Typography>
                                     </Grid>
@@ -75,7 +75,7 @@ export default function List() {
                                         </Button>
                                     </Grid>
                                 </Grid>
-                                <Typography color="textSecondary" variant="body2">
+                                <Typography color="textSecondary" variant="body2" component={'span'}>
                                     <Grid container justify="center">
                                         <div style={{ height: 400, width: '80%' }}>
                                             <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />
@@ -86,7 +86,7 @@ export default function List() {
                             <Divider variant="fullWidth" />
                             <Grid container alignItems="center">
                                 <Grid item xs>
-                                    <Typography gutterBottom variant="h4">
+                                    <Typography component={'span'} gutterBottom variant="h4">
                                         My Info (Identifier)
                                     </Typography>
                                 </Grid>

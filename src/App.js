@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, Component } from "react";
+import { Component } from "react";
 import {BrowserRouter, Route} from 'react-router-dom';
 import Main from './Main';
 import SignUp from './SignUp';
