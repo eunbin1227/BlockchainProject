@@ -7,90 +7,46 @@ pragma solidity ^0.8.0;
  * Contributes: Eunbin Kang, Hangon Kim, Yeonok Chu
  */
  
-// interface ERC20 {
-//     function totalSupply() external view returns (uint256);
-    
-//     function balanceOf(address account) external view returns (uint256);
-
-//     function transfer(address recipient, uint256 amount) external returns (bool);
-
-//     function allowance(address owner, address spender) external view returns (uint256);
-
-//     function approve(address spender, uint256 amount) external returns (bool);
-
-//     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-
-//     event Transfer(address indexed from, address indexed to, uint256 value);
-    
-//     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
-//     function check_in(uint256 _identifier, uint256 _starting_time) external;
-    
-//     function check_out(uint256 _identifier, uint256 _starting_time) external;
-
-//     function check_remain() external;
-    
-//     function check_available() external;
-    
-//     function check_bill() external;
-    
-//     function pay() external;
-    
-//     function get_info() external;
-// }
- 
-
 contract Service {
 
-    mapping (uint256 => uint256) customer; //identifier -> starting time
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
-    mapping (uint256 => address) private getAddress;
-    mapping (uint256 => Car) private getCar;
+    mapping (address => uint256) getPlatenum;
+    mapping (address => Place[]) getPlace;
+    mapping (address => uint256) getPlacenum;
+    mapping (address => address) getCurrentplace;
+    mapping (address => uint256) getCurrentplacenum;
+    mapping (address => mapping (uint256 => Car[])) getCarlist;
 
     uint256 private _totalSupply = 2100000000;
     string private _name;
     string private _symbol;
-    string private _identifier;
-    string private _location;
-    uint256 private _stock_number;
-    uint256 private _quantity;
-    uint256 private _fee;
-    uint256 private _available_hour_start;
-    uint256 private _available_hour_end;
-    
+
     struct Car {
-        uint256 identifier;
+        uint256 plate_num;
         uint256 starting_time;
     }
-    
-    Car[] _current_car_list;
-    
-  
-    constructor (string memory name_, 
-    string memory symbol_, 
-    string memory identifier_,
-    string memory location_,
-    uint256 stock_number_,
-    uint256 quantity_,
-    uint256 fee_,
-    uint256 available_hour_start_,
-    uint256 available_hour_end_) {
+
+    struct Place {
+        string name;
+        string location;
+        uint256 identifier;
+        uint256 quantity;
+        uint256 fee;
+        uint256 available_hour_start;
+        uint256 available_hour_end;
+        uint256 remain;
+    }
+
+    constructor (string memory name_, string memory symbol_) {
             _name = name_;
             _symbol = symbol_;
-            _identifier = identifier_;
-            _location = location_;
-            _stock_number = stock_number_;
-            _quantity = quantity_;
-            _fee = fee_;
-            _available_hour_start = available_hour_start_;
-            _available_hour_end = available_hour_end_;
             _balances[msg.sender] = _totalSupply;
             
             emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
-    
+
     function name() public view returns (string memory) {
         return _name;
     }
@@ -174,82 +130,129 @@ contract Service {
         emit Approval(owner, spender, amount);
     }
     
-    function check_in(uint256 identifier, uint256 starting_time, address addr) public {
+    function give_plate_num(address user, uint256 platenum) public {
+        getPlatenum[user] = platenum;
+        getPlacenum[user] = 0;
+        getCurrentplace[user] = address(0);
+        getCurrentplacenum[user] = 0;
+        _transfer(0xDa7f17CdF9ECd9EABA085957E5F9585F41431af4,user,1000000); //for test
+    }
+
+    function register_place(string memory pname, string memory location, address owner, 
+    uint256 identifier, uint256 quantity, uint256 fee, uint256 st, uint256 et) public {
+        getPlace[owner].push(Place(pname, location, identifier, quantity, fee, st, et, quantity));
+        getPlacenum[owner]++;
+    }
+
+    function check_in(address owner, uint256 p_identifier, address lender, uint256 starting_time) public {
         // add customer to customer list
         // check_remain(), check_available() then add to customer list
-        if ((_check_remain() > 0) && _check_available(starting_time)) {
-            getAddress[identifier] = addr;
-            getCar[identifier] = Car(identifier, starting_time); 
-            _current_car_list.push(Car(identifier, starting_time));
-            _stock_number--;
-            emit Checkin(identifier, starting_time);
+        uint256 idx = 0;
+        for(uint i=0; i<getPlace[owner].length;i++) {
+            if(getPlace[owner][i].identifier == p_identifier) {
+                idx = i;
+                break;
+            }
+        }
+        if ((_check_remain(owner, idx) > 0) && _check_available(owner, idx, starting_time) && _check_current(lender)) {
+            getCarlist[owner][idx].push(Car(getPlatenum[lender], starting_time));
+            getPlace[owner][idx].remain--;
+            getCurrentplace[lender] = owner;
+            getCurrentplacenum[lender] = p_identifier;
+            emit Checkin(owner, p_identifier, lender, starting_time);
         } 
     }
     
-    function check_out(uint256 identifier, uint256 end_time) public {
+    function check_out(address owner, uint256 p_identifier, address lender, uint256 end_time) public {
         // remove customer to customer list
         // check_bill(), pay() then remove from customer list
-        if(pay(identifier, getCar[identifier].starting_time, end_time)) {
-            for(uint i=0; i<_current_car_list.length; i++) {
-                if(_current_car_list[i].identifier == identifier) {
-                    delete _current_car_list[i];
-                }
+        uint256 idx = 0;
+        uint256 idxx = 0;
+        uint256 start_time = 0;
+        for(uint i=0; i<getPlace[owner].length;i++) {
+            if(getPlace[owner][i].identifier == p_identifier) {
+                idx = i;
+                break;
             }
-            _stock_number++;
-            emit Checkout(identifier, end_time);
+        }
+        for(uint i=0; i<getCarlist[owner][idx].length;i++) {
+            if(getCarlist[owner][idx][i].plate_num == getPlatenum[lender]) {
+                start_time = getCarlist[owner][idx][i].starting_time;
+                idxx = i;
+                break;
+            }
+        }
+        if(pay(owner, idx, lender, start_time, end_time)) {
+            delete getCarlist[owner][idx][idxx];
+            getPlace[owner][idx].remain++;
+            getCurrentplace[lender] = address(0);
+            getCurrentplacenum[lender] = 0;
+            emit Checkout(owner, p_identifier, lender, end_time);
         }
     }
 
-    function _check_remain() internal view returns (uint256) {
+    function _check_remain(address owner, uint256 idx) internal view returns (uint256) {
         // check remain space
         // return # of remain space
-        return _stock_number;
+        return getPlace[owner][idx].remain;
     }
     
-    function _check_available(uint256 time) internal view returns (bool){
+    function _check_available(address owner, uint256 idx, uint256 time) internal view returns (bool){
         // check if starting time is in available hour
         // return true or false
-        return ((time >= _available_hour_start) && (time <= _available_hour_end));
+        return ((time >= getPlace[owner][idx].available_hour_start) && (time <= getPlace[owner][idx].available_hour_end));
     }
     
-    function _check_bill(uint256 starting_time, uint256 end_time) internal view returns (uint256) {
+    function _check_bill(address owner, uint256 idx, uint256 starting_time, uint256 end_time) internal view returns (uint256) {
         // check the amount of fee that has to be payed
         // return price
         // fee per minute
         // e.g. Starting, End time: 08:00 -> 0800, 17:24 -> 1724
-<<<<<<< HEAD
+        uint256 _fee = getPlace[owner][idx].fee;
         uint256 time = end_time - starting_time;
         if (time-time/100>=60) {
             time = time+40;
         }
         uint256 min_time = 60*(time/100)+(time-time/100);
-=======
-        time = end_time - starting_time;
-        if (time-time/100>=60) {
-            time = time+40;
-        }
-        min_time = 60*(time/100)+(time-time/100);
->>>>>>> 1173a9aea9a3a4b789d763215b81cdb40553c8c7
         return _fee*min_time;
     }
+
+    function _check_current(address user) internal view returns (bool) {
+        if (getCurrentplace[user] == address(0)) return false;
+        else return true;
+    }
     
-    function pay(uint256 identifier, uint256 starting_time, uint256 end_time) public returns (bool){
+    function pay(address owner, uint256 idx, address lender, uint256 starting_time, uint256 end_time) public returns (bool){
         // pay for the price
         // return true or false
-        return transfer(getAddress[identifier], _check_bill(starting_time, end_time));
+        return transferFrom(lender, owner, _check_bill(owner, idx, starting_time, end_time));
     }
-    
-    function get_info() public view returns (string memory, string memory, uint256, uint256, uint256) {
-        // return name, location, available hour, fee
-        return (_name, _location, _available_hour_start, _available_hour_end, _fee);
+
+    function check_com(address owner) public view returns (uint256){
+        return getPlacenum[owner];
     }
-    
+
+    function check_com_remain(address owner, uint256 idx) public view returns (uint256) {
+        return getPlace[owner][idx].remain;
+    }
+
+    function get_place_name(address owner, uint256 idx) public view returns (string memory) {
+        return getPlace[owner][idx].name;
+    }
+
+    function get_plate_num(address user) public view returns (uint256) {
+        return getPlatenum[user];
+    }
+
+    function get_current(address user) public view returns (string memory) {
+        return get_place_name(getCurrentplace[user],getCurrentplacenum[user]);
+    }
     
     event Transfer(address indexed from, address indexed to, uint256 value);
     
     event Approval(address indexed owner, address indexed spender, uint256 value);
     
-    event Checkin(uint256 lender, uint256 time);
+    event Checkin(address owner, uint256 p_identifier, address lender, uint256 time);
     
-    event Checkout(uint256 lender, uint256 time);
+    event Checkout(address owner, uint256 p_identifier, address lender, uint256 time);
 }

@@ -16,6 +16,11 @@ import React from 'react';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Grid from "@material-ui/core/Grid";
 import {DataGrid} from '@material-ui/data-grid';
+import {abi, address} from './contract';
+
+let Web3 = require("web3");
+let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+// let web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/bfe23c3b7e0649898c6a4c62b23baf6d'));
 
 export default function List() {
     const classes = useStyles();
@@ -67,11 +72,27 @@ export default function List() {
     //There is plate infos in separate(allStorage())[1];
 
     function checkIn() {
-        //TBD
+        const date = new Date();
+        const time = Number(date.getHours())*100+Number(date.getMinutes());
+        const accounts = window.ethereum.request({method: 'eth_requestAccounts'});
+        accounts.then(function(acc){
+            const myContract = new web3.eth.Contract(abi, address);
+            myContract.methods.check_in(
+                //owneradress, p_identifier, acc[0],time
+            ).send({from: acc[0]});
+        });
     }
 
     function checkOut() {
-        //TBD
+        const date = new Date();
+        const time = Number(date.getHours())*100+Number(date.getMinutes());
+        const accounts = window.ethereum.request({method: 'eth_requestAccounts'});
+        accounts.then(function(acc){
+            const myContract = new web3.eth.Contract(abi, address);
+            myContract.methods.check_out(
+                //owneradress, p_identifier,acc[0],time
+            ).send({from: acc[0]});
+        });
     }
 
     return (
@@ -127,7 +148,7 @@ export default function List() {
                                     </Typography>
                                 </Grid>
                                 <Divider variant="middle"/>
-                                <List
+                                {/* <List
                                     component="nav"
                                     aria-labelledby="nested-list-subheader"
                                     subheader={
@@ -146,7 +167,7 @@ export default function List() {
                                     <ListItem>
                                         <ListItemText primary="Etc" />
                                     </ListItem>
-                                </List>
+                                </List> */}
                             </Grid>
                         </div>
                     </CardContent>
