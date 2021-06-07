@@ -1,14 +1,15 @@
 import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
+import {Avatar,
+        Button,
+        CssBaseline,
+        TextField,
+        Link,
+        Grid,
+        Typography,
+        Container
+} from "@material-ui/core";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -33,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp() {
     const classes = useStyles();
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -44,7 +46,7 @@ export default function SignUp() {
                     Sign up
                 </Typography>
                 <form className={classes.form} noValidate>
-                    <Grid container spacing={2}>
+                    <Grid container>
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 autoComplete="fname"

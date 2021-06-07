@@ -8,9 +8,10 @@
     "@testing-library/user-event": "^12.1.10",
     "bootstrap": "^4.3.1",
     "express": "^4.17.1",
+    "global": "^4.4.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^4.0.3",
     "surge": "^0.23.0",
     "web-vitals": "^1.0.1",
     "web3": "^1.0.0-beta.46"
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@material-ui/core": "^4.11.4",
+    "@material-ui/data-grid": "^4.0.0-alpha.30",
     "@material-ui/icons": "^4.11.2",
     "cors": "^2.8.5",
     "prop-types": "^15.7.2",
