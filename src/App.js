@@ -5,6 +5,7 @@ import Main from './Main';
 import SignUp from './SignUp';
 import List from './List';
 import Register from './Register';
+import RegisterUser from './RegisterUser';
 
 export default class App extends Component {
     render() {
@@ -15,6 +16,7 @@ export default class App extends Component {
                     <Route path="/SignUp" component={SignUp}/>
                     <Route path="/List" component={List}/>
                     <Route path="/Register" component={Register}/>
+                    <Route path="/RegisterUser" component={RegisterUser}/>
                 </BrowserRouter>
             </div>
         )

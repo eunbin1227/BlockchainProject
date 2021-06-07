@@ -15,8 +15,8 @@ import Grid from "@material-ui/core/Grid";
 import SignUp from "./SignUp";
 import Container from "@material-ui/core/Container";
 import React, {useState} from "react";
-import {login} from "./Api";
-const LOGIN_KEY = 'LOGIN_KEY';
+// import {login} from "./Api";
+// const LOGIN_KEY = 'LOGIN_KEY';
 
 
 export default function Main() {

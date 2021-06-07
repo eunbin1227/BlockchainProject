@@ -5,7 +5,7 @@ import {
     CardActions,
     CardContent,
     IconButton,
-    Divider,
+    Divider, ListSubheader, ListItem, ListItemText,
 } from '@material-ui/core';
 import { Home } from "@material-ui/icons";
 import { makeStyles } from '@material-ui/core/styles';
@@ -46,9 +46,33 @@ export default function List() {
 
     ];
 
+    function separate(array) {
+        let result1 = [];
+        let result2 = [];
+        for(let i=0; i<array.length; i++) {
+            let temp = JSON.parse(array[i]);
+            let length = Object.keys(temp).length;
+            if(length === 5) {
+                result1.push(temp);
+            }else {
+                result2.push(temp);
+            }
+        }
+        return [result1, result2];
+    }
 
-    const rows = allStorage().map(x => JSON.parse(x));
+    // const rows = allStorage().map(x => JSON.parse(x));
+    const rows = separate(allStorage())[0];
 
+    //There is plate infos in separate(allStorage())[1];
+
+    function checkIn() {
+        //TBD
+    }
+
+    function checkOut() {
+        //TBD
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -65,13 +89,16 @@ export default function List() {
                             <div className={classes.section1}>
                                 <Grid container alignItems="center">
                                     <Grid item xs>
-                                        <Typography gutterBottom variant="h4" component={'span'}>
+                                        <Typography gutterBottom variant="h4" component={'span'} className={classes.span}>
                                             Stock List
                                         </Typography>
                                     </Grid>
                                     <Grid item>
-                                        <Button variant="contained" color="primary" component={Link} to="/Register">
-                                            Register
+                                        <Button variant="contained" color="primary" component={Link} to="/RegisterUser" className={classes.button}>
+                                            Register User
+                                        </Button>
+                                        <Button variant="contained" color="primary" component={Link} to="/Register" className={classes.button}>
+                                            Register Stock
                                         </Button>
                                     </Grid>
                                 </Grid>
@@ -82,7 +109,16 @@ export default function List() {
                                         </div>
                                     </Grid>
                                 </Typography>
+                                <Grid item>
+                                    <Button variant="contained" color="primary" onClick={checkIn} className={classes.button}>
+                                        Check In
+                                    </Button>
+                                    <Button variant="contained" color="primary" onClick={checkOut} className={classes.button}>
+                                        Check Out
+                                    </Button>
+                                </Grid>
                             </div>
+
                             <Divider variant="fullWidth" />
                             <Grid container alignItems="center">
                                 <Grid item xs>
@@ -91,6 +127,26 @@ export default function List() {
                                     </Typography>
                                 </Grid>
                                 <Divider variant="middle"/>
+                                <List
+                                    component="nav"
+                                    aria-labelledby="nested-list-subheader"
+                                    subheader={
+                                        <ListSubheader component="div" id="nested-list-subheader">
+                                            My Information
+                                        </ListSubheader>
+                                    }
+                                    className={classes.list}
+                                >
+                                    <ListItem>
+                                        <ListItemText primary="Wallet Address" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Plate Number" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Etc" />
+                                    </ListItem>
+                                </List>
                             </Grid>
                         </div>
                     </CardContent>
@@ -112,11 +168,6 @@ const useStyles = makeStyles((theme) => ({
         right: '1vw',
         top: '1vh',
     },
-    title: {
-        fontSize: 40,
-        fontWeight: 500,
-        paddingTop: '10vh',
-    },
     content: {
     },
     container: {
@@ -125,34 +176,14 @@ const useStyles = makeStyles((theme) => ({
         width: '100vw',
         placeContent: 'center',
     },
-    explanation: {
-        width: '53vw',
-        fontSize: 17,
-        fontWeight: 500,
-        textAlign: "justify",
-        lineHeight: '25px',
-    },
-    graphContainer: {
-        padding: '3vh',
-    },
     span: {
         padding: '5vh',
     },
-    bottomButton: {
+    button: {
         marginLeft: 'auto',
-    },
-    prevButton: {
-        fontSize: 18,
-        textTransform: "none",
         marginRight: '2vw',
-    },
-    nextButton: {
-        fontSize: 18,
-        textTransform: "none",
-        marginRight: "6vw",
-    },
-    chip: {
-        margin: theme.spacing(0.5),
+        marginBottom: '2vh',
+        marginTop: '2vh',
     },
     section1: {
         margin: theme.spacing(3, 2),
@@ -163,7 +194,11 @@ const useStyles = makeStyles((theme) => ({
     section3: {
         margin: theme.spacing(3, 1, 1),
     },
-
+    list: {
+        width: '100%',
+        maxWidth: 360,
+        backgroundColor: theme.palette.background.paper,
+    },
 }));
 
 const theme = createMuiTheme({

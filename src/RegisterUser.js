@@ -22,43 +22,26 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export class Infos {
-    constructor(name, quantity, time, fee) {
-        this._name = name;
-        this._quantity = quantity;
-        this._time = time;
-        this._fee = fee;
+export class Users {
+    constructor(plate) {
+        this._plate = plate;
+
     }
 
-    get name() {
-        return this._name
-    }
-
-    get quantity() {
-        return this._quantity
-    }
-
-    get time() {
-        return this._time
-    }
-
-    get fee() {
-        return this._fee
+    get plate() {
+        return this._plate
     }
 }
 
 
-export default function Register() {
+export default function RegisterUser() {
     const classes = useStyles();
-    const [name, setName] = useState('');
-    const [quantity, setQuantity] = useState('');
-    const [time, setTime] = useState('');
-    const [fee, setFee] = useState('');
+    const [plate, setPlate] = useState('');
+
 
     function handleSubmit(event) {
-        const info = new Infos(name, quantity, time, fee);
-        localStorage.setItem(info.name, JSON.stringify(info));
-
+        const user = new Users(plate);
+        localStorage.setItem(user.plate, JSON.stringify(user));
     }
 
     return (
@@ -78,28 +61,11 @@ export default function Register() {
                     <div>
                         <Grid container>
                             <TextField required
-                                       id="name-loc"
-                                       label="Name, Location"
+                                       id="plate"
+                                       label="Plate Number"
                                        variant="outlined"
-                                       value={name}
-                                       onChange={e => setName(e.target.value)}/> <br/>
-                            <TextField required
-                                       id="quantity"
-                                       label="Quantity"
-                                       variant="outlined"
-                                       value={quantity}
-                                       onChange={e=>setQuantity(e.target.value)}/> <br/>
-                            <TextField required
-                                       id="time"
-                                       label="Time"
-                                       variant="outlined"
-                                       value={time}
-                                       onChange={e=>setTime(e.target.value)}/> <br/>
-                            <TextField required id="fee-per-min"
-                                       label="Fee per min"
-                                       variant="outlined"
-                                       value={fee}
-                                       onChange={e=>setFee(e.target.value)}/> <br/>
+                                       value={plate}
+                                       onChange={e => setPlate(e.target.value)}/> <br/>
                         </Grid>
                         <Grid container>
                             <Button type="submit"
