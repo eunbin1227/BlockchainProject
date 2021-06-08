@@ -245,6 +245,7 @@ contract Service {
     }
 
     function get_current(address user) public view returns (string memory) {
+        if (getCurrentplace[user] == address(0)) return "Nowhere!";
         return get_place_name(getCurrentplace[user],getCurrentplacenum[user]);
     }
     

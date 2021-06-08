@@ -11,12 +11,12 @@ import { Home } from "@material-ui/icons";
 import { makeStyles } from '@material-ui/core/styles';
 import StickyFooter from "./StickyFooter";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import React from 'react';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Grid from "@material-ui/core/Grid";
-import {DataGrid} from '@material-ui/data-grid';
-import {abi, address} from './contract';
+import { DataGrid } from '@material-ui/data-grid';
+import { abi, address } from './contract';
 
 let Web3 = require("web3");
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
@@ -30,8 +30,8 @@ export default function List() {
             keys = Object.keys(localStorage),
             i = keys.length;
 
-        while ( i-- ) {
-            let value = {id: i}
+        while (i--) {
+            let value = { id: i }
             let res = Object.assign(value, JSON.parse(localStorage.getItem(keys[i])));
             values.push(JSON.stringify(res));
         }
@@ -54,12 +54,12 @@ export default function List() {
     function separate(array) {
         let result1 = [];
         let result2 = [];
-        for(let i=0; i<array.length; i++) {
+        for (let i = 0; i < array.length; i++) {
             let temp = JSON.parse(array[i]);
             let length = Object.keys(temp).length;
-            if(length === 5) {
+            if (length === 5) {
                 result1.push(temp);
-            }else {
+            } else {
                 result2.push(temp);
             }
         }
@@ -73,25 +73,45 @@ export default function List() {
 
     function checkIn() {
         const date = new Date();
-        const time = Number(date.getHours())*100+Number(date.getMinutes());
-        const accounts = window.ethereum.request({method: 'eth_requestAccounts'});
-        accounts.then(function(acc){
+        const time = Number(date.getHours()) * 100 + Number(date.getMinutes());
+        const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
+        accounts.then(function (acc) {
             const myContract = new web3.eth.Contract(abi, address);
             myContract.methods.check_in(
                 //owneradress, p_identifier, acc[0],time
-            ).send({from: acc[0]});
+            ).send({ from: acc[0] });
         });
     }
 
     function checkOut() {
         const date = new Date();
-        const time = Number(date.getHours())*100+Number(date.getMinutes());
-        const accounts = window.ethereum.request({method: 'eth_requestAccounts'});
-        accounts.then(function(acc){
+        const time = Number(date.getHours()) * 100 + Number(date.getMinutes());
+        const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
+        accounts.then(function (acc) {
             const myContract = new web3.eth.Contract(abi, address);
             myContract.methods.check_out(
                 //owneradress, p_identifier,acc[0],time
-            ).send({from: acc[0]});
+            ).send({ from: acc[0] });
+        });
+    }
+
+    var usrAddr = "Need Update!";
+    var usrPlateNumber = "Need Update!";
+    var usrCurrentPlaceName = "Need Update!";
+
+    function updateInfo() {
+        var usrPlaceName = [];
+        const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
+        accounts.then(function (acc) {
+            usrAddr = acc[0];
+            const myContract = new web3.eth.Contract(abi, address);
+            myContract.methods.get_plate_num(acc[0]).call().then((num) => { usrPlateNumber = String(num) });
+            myContract.methods.get_current(acc[0]).call().then((name) => { usrCurrentPlaceName = name });
+            myContract.methods.check_com(acc[0]).call().then((num) => {
+                for (var step = 1; step <= num; step++) {
+                    myContract.methods.get_place_name(acc[0], step).call().then((name) => { usrPlaceName.push(name) });
+                }
+            });
         });
     }
 
@@ -102,7 +122,7 @@ export default function List() {
                 <Card className={classes.root} elevation={3}>
                     <CardActions>
                         <div className={classes.actions}>
-                            <IconButton component={Link} to="/"> <Home/> </IconButton>
+                            <IconButton component={Link} to="/"> <Home /> </IconButton>
                         </div>
                     </CardActions>
                     <CardContent className={classes.content}>
@@ -137,6 +157,9 @@ export default function List() {
                                     <Button variant="contained" color="primary" onClick={checkOut} className={classes.button}>
                                         Check Out
                                     </Button>
+                                    <Button variant="contained" color="primary" onClick={updateInfo} className={classes.button}>
+                                        Update My Info
+                                    </Button>
                                 </Grid>
                             </div>
 
@@ -144,10 +167,10 @@ export default function List() {
                             <Grid container alignItems="center">
                                 <Grid item xs>
                                     <Typography component={'span'} gutterBottom variant="h4">
-                                        My Info (Identifier)
+                                        My Info.
                                     </Typography>
                                 </Grid>
-                                <Divider variant="middle"/>
+                                <Divider variant="middle" />
                                 {/* <List
                                     component="nav"
                                     aria-labelledby="nested-list-subheader"
@@ -171,7 +194,7 @@ export default function List() {
                             </Grid>
                         </div>
                     </CardContent>
-                    <StickyFooter/>
+                    <StickyFooter />
                 </Card>
             </div>
         </ThemeProvider>
