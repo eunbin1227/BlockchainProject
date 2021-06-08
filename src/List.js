@@ -12,7 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import StickyFooter from "./StickyFooter";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { Link } from 'react-router-dom';
-import React from 'react';
+import React, {useState} from 'react';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Grid from "@material-ui/core/Grid";
 import { DataGrid } from '@material-ui/data-grid';
@@ -95,9 +95,12 @@ export default function List() {
         });
     }
 
-    var usrAddr = "Need Update!";
-    var usrPlateNumber = "Need Update!";
-    var usrCurrentPlaceName = "Need Update!";
+    const [usrAddr, setUsrAddr] = useState('Need Update!');
+    const [usrPlateNumber, setUsrPlateNumber] = useState('Need Update!');
+    const [usrCurrentPlaceName, setUsrCurrentPlaceName] = useState('Need Update!');
+    // var usrAddr = "Need Update!";
+    // var usrPlateNumber = "Need Update!";
+    // var usrCurrentPlaceName = "Need Update!";
     var test = 1;
 
     function updateInfo() {
@@ -105,10 +108,10 @@ export default function List() {
         var usrPlaceName = [];
         const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
         accounts.then(function (acc) {
-            usrAddr = acc[0];
+            setUsrAddr(acc[0]);
             const myContract = new web3.eth.Contract(abi, address);
-            myContract.methods.get_plate_num(acc[0]).call().then(function(num){ usrPlateNumber = String(num) });
-            myContract.methods.get_current(acc[0]).call().then(function(name){ usrCurrentPlaceName = name });
+            myContract.methods.get_plate_num(acc[0]).call().then((num) => setUsrPlateNumber(String(num)));
+            myContract.methods.get_current(acc[0]).call().then((name) => setUsrCurrentPlaceName(String(name)));
             myContract.methods.check_com(acc[0]).call().then(function(num){
                 for (var step = 1; step <= num; step++) {
                     myContract.methods.get_place_name(acc[0], step).call().then((name) => { usrPlaceName.push(name) });
