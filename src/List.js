@@ -78,7 +78,7 @@ export default function List() {
         accounts.then(function (acc) {
             const myContract = new web3.eth.Contract(abi, address);
             myContract.methods.check_in(
-                //owneradress, p_identifier, acc[0],time
+                //(owneradress), (p_identifier), acc[0],time
             ).send({ from: acc[0] });
         });
     }
@@ -90,7 +90,7 @@ export default function List() {
         accounts.then(function (acc) {
             const myContract = new web3.eth.Contract(abi, address);
             myContract.methods.check_out(
-                //owneradress, p_identifier,acc[0],time
+                //(owneradress), (p_identifier), acc[0],time
             ).send({ from: acc[0] });
         });
     }
