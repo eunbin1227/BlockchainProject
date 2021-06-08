@@ -218,8 +218,8 @@ contract Service {
     }
 
     function _check_current(address user) internal view returns (bool) {
-        if (getCurrentplace[user] == address(0)) return false;
-        else return true;
+        if (getCurrentplace[user] == address(0)) return true;
+        else return false;
     }
     
     function pay(address owner, uint256 idx, address lender, uint256 starting_time, uint256 end_time) public returns (bool){
@@ -245,8 +245,12 @@ contract Service {
     }
 
     function get_current(address user) public view returns (string memory) {
-        if (getCurrentplace[user] == address(0)) return "Nowhere!";
-        return get_place_name(getCurrentplace[user],getCurrentplacenum[user]);
+        if (getCurrentplace[user] == address(0)) {
+            return "Nowhere!";
+        }
+        else {
+            return get_place_name(getCurrentplace[user],getCurrentplacenum[user]);
+        }
     }
     
     event Transfer(address indexed from, address indexed to, uint256 value);
