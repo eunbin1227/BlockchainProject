@@ -12,7 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import StickyFooter from "./StickyFooter";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { Link } from 'react-router-dom';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Grid from "@material-ui/core/Grid";
 import { DataGrid } from '@material-ui/data-grid';
@@ -42,7 +42,8 @@ export default function List() {
     const columns = [
         { field: '_name', headerName: 'Name, Location', width: 200 },
         { field: '_quantity', headerName: 'Quantity', width: 150 },
-        { field: '_time', headerName: 'Time', width: 150 },
+        { field: '_stime', headerName: 'Open Time', width: 150 },
+        { field: '_etime', headerName: 'Close Time', width: 150 },
         {
             field: '_fee',
             headerName: 'Fee per min',
@@ -70,6 +71,7 @@ export default function List() {
     const rows = separate(allStorage())[0];
 
     //There is plate infos in separate(allStorage())[1];
+    const [select, setSelection] = useState([]);
 
     function checkIn() {
         const date = new Date();
@@ -78,7 +80,7 @@ export default function List() {
         accounts.then(function (acc) {
             const myContract = new web3.eth.Contract(abi, address);
             myContract.methods.check_in(
-                //(owneradress), (p_identifier), acc[0], time
+                rows[findStock()]._address, rows[findStock()]._p_id, acc[0], time
             ).send({ from: acc[0] });
         });
     }
@@ -90,21 +92,24 @@ export default function List() {
         accounts.then(function (acc) {
             const myContract = new web3.eth.Contract(abi, address);
             myContract.methods.check_out(
-                //(owneradress), (p_identifier), acc[0],time
+                rows[findStock()]._address, rows[findStock()]._p_id, acc[0], time
             ).send({ from: acc[0] });
         });
+    }
+
+    function findStock() {
+        for(var i=0;i<rows.length;i++) {
+            if (rows[i].id == select[0]) return i;
+        }
     }
 
     const [usrAddr, setUsrAddr] = useState('Need Update!');
     const [usrPlateNumber, setUsrPlateNumber] = useState('Need Update!');
     const [usrCurrentPlaceName, setUsrCurrentPlaceName] = useState('Need Update!');
-    // var usrAddr = "Need Update!";
-    // var usrPlateNumber = "Need Update!";
-    // var usrCurrentPlaceName = "Need Update!";
-    var test = 1;
+    const [usrPlaceName, setUsrPlaceName] = useState('Need Update!');
+    const [usrBallance, setUsrBalance] = useState('Need Update!');
 
     function updateInfo() {
-        test = test+1;
         var usrPlaceName = [];
         const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
         accounts.then(function (acc) {
@@ -112,11 +117,11 @@ export default function List() {
             const myContract = new web3.eth.Contract(abi, address);
             myContract.methods.get_plate_num(acc[0]).call().then((num) => setUsrPlateNumber(String(num)));
             myContract.methods.get_current(acc[0]).call().then((name) => setUsrCurrentPlaceName(String(name)));
-            myContract.methods.check_com(acc[0]).call().then(function(num){
-                for (var step = 1; step <= num; step++) {
-                    myContract.methods.get_place_name(acc[0], step).call().then((name) => { usrPlaceName.push(name) });
-                }
-            });
+            myContract.methods.balanceOf(acc[0]).call().then((num) => setUsrBalance(String(num)));
+            setUsrPlaceName('No Registered Places!');
+            for(var i=0;i<rows.length;i++) {
+                if (rows[i]._address == acc[0]) setUsrPlaceName(String(rows[i]._name));
+            }
         });
     }
 
@@ -151,7 +156,11 @@ export default function List() {
                                 <Typography color="textSecondary" variant="body2" component={'span'}>
                                     <Grid container justify="center">
                                         <div style={{ height: 400, width: '80%' }}>
-                                            <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />
+                                            <DataGrid rows={rows} columns={columns} pageSize={5}
+                                                onSelectionModelChange={(newSelection) => {
+                                                    setSelection(newSelection.selectionModel);
+                                                }}
+                                            />
                                         </div>
                                     </Grid>
                                 </Typography>
@@ -180,13 +189,16 @@ export default function List() {
                                 My Wallet Address : {usrAddr}
                             </Typography>
                             <Typography gutterBottom variant="h6" align="left">
+                                My Ballance : {usrBallance}
+                            </Typography>
+                            <Typography gutterBottom variant="h6" align="left">
                                 My Plate Number : {usrPlateNumber}
                             </Typography>
                             <Typography gutterBottom variant="h6" align="left">
                                 Now, I am at : {usrCurrentPlaceName}
                             </Typography>
                             <Typography gutterBottom variant="h6" align="left">
-                                My Places : ToDo... {test}
+                                My Places : {usrPlaceName}
                             </Typography>
                         </div>
                     </CardContent>

@@ -28,13 +28,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export class Infos {
-    constructor(name, quantity, stime, etime, fee, address) {
+    constructor(name, quantity, stime, etime, fee, address, p_id) {
         this._name = name;
         this._quantity = quantity;
         this._stime = stime;
         this._etime = etime;
         this._fee = fee;
         this._address = address;
+        this._p_id = p_id;
     }
 
     get name() {
@@ -61,6 +62,10 @@ export class Infos {
         return this._address
     }
 
+    get pid() {
+        return this._p_id
+    }
+
 }
 
 
@@ -85,7 +90,7 @@ export default function Register() {
                 name,name,acc[0],Number(p_id),Number(quantity),Number(fee),Number(stime),Number(etime)
             ).send({from: acc[0]});
 
-            const info = new Infos(name, quantity, stime, etime, fee, acc[0]);
+            const info = new Infos(name, quantity, stime, etime, fee, acc[0],p_id);
             localStorage.setItem(info.name, JSON.stringify(info));
         });
 
