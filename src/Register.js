@@ -5,6 +5,11 @@ import {Link} from "react-router-dom";
 import {Button, Card} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
+import {abi, address} from './contract';
+
+let Web3 = require("web3");
+let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+// let web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/bfe23c3b7e0649898c6a4c62b23baf6d'));
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,10 +28,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export class Infos {
-    constructor(name, quantity, time, fee) {
+    constructor(name, quantity, stime, etime, fee) {
         this._name = name;
         this._quantity = quantity;
-        this._time = time;
+        this._stime = stime;
+        this._etime = etime;
         this._fee = fee;
     }
 
@@ -38,8 +44,12 @@ export class Infos {
         return this._quantity
     }
 
-    get time() {
-        return this._time
+    get stime() {
+        return this._stime
+    }
+
+    get etime() {
+        return this._etime
     }
 
     get fee() {
@@ -52,13 +62,25 @@ export default function Register() {
     const classes = useStyles();
     const [name, setName] = useState('');
     const [quantity, setQuantity] = useState('');
-    const [time, setTime] = useState('');
+    const [stime, setStime] = useState('');
+    const [etime, setEtime] = useState('');
     const [fee, setFee] = useState('');
 
     function handleSubmit(event) {
-        const info = new Infos(name, quantity, time, fee);
+        const info = new Infos(name, quantity, stime, etime, fee);
         localStorage.setItem(info.name, JSON.stringify(info));
-
+        
+        const accounts = window.ethereum.request({method: 'eth_requestAccounts'});
+        accounts.then(function(acc){
+            const myContract = new web3.eth.Contract(abi, address);
+            var p_id = 0;
+            myContract.methods.check_com(acc[0]).call().then(function(num){
+                p_id = num+1;
+            });
+            myContract.methods.register_place(
+                name,name,acc[0],Number(p_id),Number(quantity),Number(fee),Number(stime),Number(etime)
+            ).send({from: acc[0]});
+        });
     }
 
     return (
@@ -90,11 +112,17 @@ export default function Register() {
                                        value={quantity}
                                        onChange={e=>setQuantity(e.target.value)}/> <br/>
                             <TextField required
-                                       id="time"
-                                       label="Time"
+                                       id="stime"
+                                       label="Starting Time"
                                        variant="outlined"
-                                       value={time}
-                                       onChange={e=>setTime(e.target.value)}/> <br/>
+                                       value={stime}
+                                       onChange={e=>setStime(e.target.value)}/> <br/>
+                            <TextField required
+                                       id="etime"
+                                       label="End Time"
+                                       variant="outlined"
+                                       value={etime}
+                                       onChange={e=>setEtime(e.target.value)}/> <br/>
                             <TextField required id="fee-per-min"
                                        label="Fee per min"
                                        variant="outlined"
