@@ -73,7 +73,10 @@ export default function Register() {
         const accounts = window.ethereum.request({method: 'eth_requestAccounts'});
         accounts.then(function(acc){
             const myContract = new web3.eth.Contract(abi, address);
-            const p_id = myContract.methods.check_com().call();
+            var p_id = 0;
+            myContract.methods.check_com(acc[0]).call().then(function(num){
+                p_id = num+1;
+            });
             myContract.methods.register_place(
                 name,name,acc[0],Number(p_id),Number(quantity),Number(fee),Number(stime),Number(etime)
             ).send({from: acc[0]});
