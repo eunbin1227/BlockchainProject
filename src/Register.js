@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-import {Link} from "react-router-dom";
-import {Button, Card} from "@material-ui/core";
+import { Link } from "react-router-dom";
+import { Button, Card } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import {abi, address} from './contract';
+import { abi, address } from './contract';
 
 let Web3 = require("web3");
 let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
@@ -77,21 +77,23 @@ export default function Register() {
     const [etime, setEtime] = useState('');
     const [fee, setFee] = useState('');
 
+    console.log(localStorage);
+    console.log(allStorage());
+
     function handleSubmit(event) {
 
-        const accounts = window.ethereum.request({method: 'eth_requestAccounts'});
-        accounts.then(function(acc){
+        const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
+        accounts.then(function (acc) {
             const myContract = new web3.eth.Contract(abi, address);
-            var p_id = 0;
-            myContract.methods.check_com(acc[0]).call().then(function(num){
-                p_id = num+1;
-            });
-            myContract.methods.register_place(
-                name,name,acc[0],Number(p_id),Number(quantity),Number(fee),Number(stime),Number(etime)
-            ).send({from: acc[0]});
+            myContract.methods.check_com(acc[0]).call().then(function (num) {
+                var p_id = Number(num) + 1;
+                myContract.methods.register_place(
+                    name, name, acc[0], Number(p_id), Number(quantity), Number(fee), Number(stime), Number(etime)
+                ).send({ from: acc[0] });
 
-            const info = new Infos(name, quantity, stime, etime, fee, acc[0],p_id);
-            localStorage.setItem(info.name, JSON.stringify(info));
+                const info = new Infos(name, quantity, stime, etime, fee, acc[0], p_id);
+                localStorage.setItem(info.name, JSON.stringify(info));
+            });
         });
 
 
@@ -114,46 +116,46 @@ export default function Register() {
                     <div>
                         <Grid container>
                             <TextField required
-                                       id="name-loc"
-                                       label="Name, Location"
-                                       variant="outlined"
-                                       value={name}
-                                       onChange={e => setName(e.target.value)}/> <br/>
+                                id="name-loc"
+                                label="Name, Location"
+                                variant="outlined"
+                                value={name}
+                                onChange={e => setName(e.target.value)} /> <br />
                             <TextField required
-                                       id="quantity"
-                                       label="Quantity"
-                                       variant="outlined"
-                                       value={quantity}
-                                       onChange={e=>setQuantity(e.target.value)}/> <br/>
+                                id="quantity"
+                                label="Quantity"
+                                variant="outlined"
+                                value={quantity}
+                                onChange={e => setQuantity(e.target.value)} /> <br />
                             <TextField required
-                                       id="stime"
-                                       label="Starting Time"
-                                       variant="outlined"
-                                       value={stime}
-                                       onChange={e=>setStime(e.target.value)}/> <br/>
+                                id="stime"
+                                label="Starting Time"
+                                variant="outlined"
+                                value={stime}
+                                onChange={e => setStime(e.target.value)} /> <br />
                             <TextField required
-                                       id="etime"
-                                       label="End Time"
-                                       variant="outlined"
-                                       value={etime}
-                                       onChange={e=>setEtime(e.target.value)}/> <br/>
+                                id="etime"
+                                label="End Time"
+                                variant="outlined"
+                                value={etime}
+                                onChange={e => setEtime(e.target.value)} /> <br />
                             <TextField required id="fee-per-min"
-                                       label="Fee per min"
-                                       variant="outlined"
-                                       value={fee}
-                                       onChange={e=>setFee(e.target.value)}/> <br/>
+                                label="Fee per min"
+                                variant="outlined"
+                                value={fee}
+                                onChange={e => setFee(e.target.value)} /> <br />
                         </Grid>
                         <Grid container>
                             <Button type="submit"
-                                    variant="contained"
-                                    color="primary"
-                                    component={Link}
-                                    to='/List'
-                                    className={classes.button}
-                                    onClick={handleSubmit}
+                                variant="contained"
+                                color="primary"
+                                component={Link}
+                                to='/List'
+                                className={classes.button}
+                                onClick={handleSubmit}
                             >
                                 Register
-                            </Button> <br/>
+                            </Button> <br />
                         </Grid>
                     </div>
                 </form>
