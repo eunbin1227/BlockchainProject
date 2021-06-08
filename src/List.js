@@ -58,7 +58,7 @@ export default function List() {
         for (let i = 0; i < array.length; i++) {
             let temp = JSON.parse(array[i]);
             let length = Object.keys(temp).length;
-            if (length === 6) {
+            if (length === 8) {
                 result1.push(temp);
             } else {
                 result2.push(temp);

@@ -77,9 +77,6 @@ export default function Register() {
     const [etime, setEtime] = useState('');
     const [fee, setFee] = useState('');
 
-    console.log(localStorage);
-    console.log(allStorage());
-
     function handleSubmit(event) {
 
         const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
