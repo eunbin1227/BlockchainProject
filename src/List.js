@@ -118,7 +118,6 @@ export default function List() {
                                     </Button>
                                 </Grid>
                             </div>
-
                             <Divider variant="fullWidth" />
                             <Grid container alignItems="center">
                                 <Grid item xs>
@@ -127,25 +126,25 @@ export default function List() {
                                     </Typography>
                                 </Grid>
                                 <Divider variant="middle"/>
-                                <List
-                                    component="nav"
-                                    aria-labelledby="nested-list-subheader"
-                                    subheader={
-                                        <ListSubheader component="div" id="nested-list-subheader">
-                                            My Information
-                                        </ListSubheader>
-                                    }
-                                    className={classes.list}
-                                >
-                                    <ListItem>
-                                        <ListItemText primary="Wallet Address" />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText primary="Plate Number" />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText primary="Etc" />
-                                    </ListItem>
+                                <List>
+                                {/*    component="nav"*/}
+                                {/*    aria-labelledby="nested-list-subheader"*/}
+                                {/*    subheader={*/}
+                                {/*        <ListSubheader component="div" id="nested-list-subheader">*/}
+                                {/*            My Information*/}
+                                {/*        </ListSubheader>*/}
+                                {/*    }*/}
+                                {/*    className={classes.list}*/}
+
+                                    {/*<ListItem>*/}
+                                    {/*    <ListItemText primary="Wallet Address" />*/}
+                                    {/*/!*</ListItem>*!/*/}
+                                    {/*/!*<ListItem>*!/*/}
+                                    {/*    <ListItemText primary="Plate Number" />*/}
+                                    {/*/!*</ListItem>*!/*/}
+                                    {/*/!*<ListItem>*!/*/}
+                                    {/*    <ListItemText primary="Etc" />*/}
+                                    {/*</ListItem>*/}
                                 </List>
                             </Grid>
                         </div>
