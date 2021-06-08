@@ -98,16 +98,18 @@ export default function List() {
     var usrAddr = "Need Update!";
     var usrPlateNumber = "Need Update!";
     var usrCurrentPlaceName = "Need Update!";
+    var test = 1;
 
     function updateInfo() {
+        test = test+1;
         var usrPlaceName = [];
         const accounts = window.ethereum.request({ method: 'eth_requestAccounts' });
         accounts.then(function (acc) {
             usrAddr = acc[0];
             const myContract = new web3.eth.Contract(abi, address);
-            myContract.methods.get_plate_num(acc[0]).call().then((num) => { usrPlateNumber = String(num) });
-            myContract.methods.get_current(acc[0]).call().then((name) => { usrCurrentPlaceName = name });
-            myContract.methods.check_com(acc[0]).call().then((num) => {
+            myContract.methods.get_plate_num(acc[0]).call().then(function(num){ usrPlateNumber = String(num) });
+            myContract.methods.get_current(acc[0]).call().then(function(name){ usrCurrentPlaceName = name });
+            myContract.methods.check_com(acc[0]).call().then(function(num){
                 for (var step = 1; step <= num; step++) {
                     myContract.methods.get_place_name(acc[0], step).call().then((name) => { usrPlaceName.push(name) });
                 }
@@ -171,27 +173,19 @@ export default function List() {
                                     </Typography>
                                 </Grid>
                                 <Divider variant="middle" />
-                                {/* <List
-                                    component="nav"
-                                    aria-labelledby="nested-list-subheader"
-                                    subheader={
-                                        <ListSubheader component="div" id="nested-list-subheader">
-                                            My Information
-                                        </ListSubheader>
-                                    }
-                                    className={classes.list}
-                                >
-                                    <ListItem>
-                                        <ListItemText primary="Wallet Address" />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText primary="Plate Number" />
-                                    </ListItem>
-                                    <ListItem>
-                                        <ListItemText primary="Etc" />
-                                    </ListItem>
-                                </List> */}
                             </Grid>
+                            <Typography gutterBottom variant="h6" align="left">
+                                My Wallet Address : {usrAddr}
+                            </Typography>
+                            <Typography gutterBottom variant="h6" align="left">
+                                My Plate Number : {usrPlateNumber}
+                            </Typography>
+                            <Typography gutterBottom variant="h6" align="left">
+                                Now, I am at : {usrCurrentPlaceName}
+                            </Typography>
+                            <Typography gutterBottom variant="h6" align="left">
+                                My Places : ToDo... {test}
+                            </Typography>
                         </div>
                     </CardContent>
                     <StickyFooter />
