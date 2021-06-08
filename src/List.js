@@ -57,7 +57,7 @@ export default function List() {
         for (let i = 0; i < array.length; i++) {
             let temp = JSON.parse(array[i]);
             let length = Object.keys(temp).length;
-            if (length === 5) {
+            if (length === 6) {
                 result1.push(temp);
             } else {
                 result2.push(temp);
@@ -78,7 +78,7 @@ export default function List() {
         accounts.then(function (acc) {
             const myContract = new web3.eth.Contract(abi, address);
             myContract.methods.check_in(
-                //(owneradress), (p_identifier), acc[0],time
+                //(owneradress), (p_identifier), acc[0], time
             ).send({ from: acc[0] });
         });
     }

@@ -28,12 +28,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export class Infos {
-    constructor(name, quantity, stime, etime, fee) {
+    constructor(name, quantity, stime, etime, fee, address) {
         this._name = name;
         this._quantity = quantity;
         this._stime = stime;
         this._etime = etime;
         this._fee = fee;
+        this._address = address;
     }
 
     get name() {
@@ -55,6 +56,11 @@ export class Infos {
     get fee() {
         return this._fee
     }
+
+    get address() {
+        return this._address
+    }
+
 }
 
 
@@ -67,9 +73,7 @@ export default function Register() {
     const [fee, setFee] = useState('');
 
     function handleSubmit(event) {
-        const info = new Infos(name, quantity, stime, etime, fee);
-        localStorage.setItem(info.name, JSON.stringify(info));
-        
+
         const accounts = window.ethereum.request({method: 'eth_requestAccounts'});
         accounts.then(function(acc){
             const myContract = new web3.eth.Contract(abi, address);
@@ -80,7 +84,12 @@ export default function Register() {
             myContract.methods.register_place(
                 name,name,acc[0],Number(p_id),Number(quantity),Number(fee),Number(stime),Number(etime)
             ).send({from: acc[0]});
+
+            const info = new Infos(name, quantity, stime, etime, fee, acc[0]);
+            localStorage.setItem(info.name, JSON.stringify(info));
         });
+
+
     }
 
     return (
