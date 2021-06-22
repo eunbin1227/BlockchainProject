@@ -123,6 +123,9 @@ export default function List() {
                 if (rows[i]._address == acc[0]) setUsrPlaceName(String(rows[i]._name));
             }
         });
+        const date = new Date();
+        const time = Number(date.getHours()) * 100 + Number(date.getMinutes());
+        console.log(time)
     }
 
     return (

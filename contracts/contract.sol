@@ -9,14 +9,14 @@ pragma solidity ^0.8.0;
  
 contract Service {
 
-    mapping (address => uint256) private _balances;
-    mapping (address => mapping (address => uint256)) private _allowances;
-    mapping (address => uint256) getPlatenum;
-    mapping (address => Place[]) getPlace;
-    mapping (address => uint256) getPlacenum;
-    mapping (address => address) getCurrentplace;
-    mapping (address => uint256) getCurrentplacenum;
-    mapping (address => mapping (uint256 => Car[])) getCarlist;
+    mapping (address => uint256) private _balances; 
+    mapping (address => mapping (address => uint256)) private _allowances; 
+    mapping (address => uint256) getPlatenum; //usr addr -> platenum
+    mapping (address => Place[]) getPlace; //owner addr -> list of places
+    mapping (address => uint256) getPlacenum; //owner addr -> number of places
+    mapping (address => address) getCurrentplace; //usr addr -> owner addr 
+    mapping (address => uint256) getCurrentplacenum; //usr addr -> p_identifier
+    mapping (address => mapping (uint256 => Car[])) getCarlist; //owner addr -> p_identifier -> list of cars
 
     uint256 private _totalSupply = 2100000000;
     string private _name;
@@ -84,9 +84,9 @@ contract Service {
     function transferFrom(address sender, address recipient, uint256 amount) public virtual returns (bool) {
         _transfer(sender, recipient, amount);
 
-        uint256 currentAllowance = _allowances[sender][msg.sender];
+        uint256 currentAllowance = _allowances[sender][recipient];
         require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
-        _approve(sender, msg.sender, currentAllowance - amount);
+        _approve(sender, recipient, currentAllowance - amount);
 
         return true;
     }
@@ -135,7 +135,7 @@ contract Service {
         getPlacenum[user] = 0;
         getCurrentplace[user] = address(0);
         getCurrentplacenum[user] = 0;
-        _transfer(0xDa7f17CdF9ECd9EABA085957E5F9585F41431af4,user,1000000); //for test
+        _transfer(0xDa7f17CdF9ECd9EABA085957E5F9585F41431af4,user,10000); //for test
     }
 
     function register_place(string memory pname, string memory location, address owner, 
@@ -155,7 +155,7 @@ contract Service {
             }
         }
         if ((_check_remain(owner, idx) > 0) && _check_available(owner, idx, starting_time) && _check_current(lender)) {
-            getCarlist[owner][idx].push(Car(getPlatenum[lender], starting_time));
+            getCarlist[owner][p_identifier].push(Car(getPlatenum[lender], starting_time));
             getPlace[owner][idx].remain--;
             getCurrentplace[lender] = owner;
             getCurrentplacenum[lender] = p_identifier;
@@ -175,15 +175,15 @@ contract Service {
                 break;
             }
         }
-        for(uint i=0; i<getCarlist[owner][idx].length;i++) {
-            if(getCarlist[owner][idx][i].plate_num == getPlatenum[lender]) {
-                start_time = getCarlist[owner][idx][i].starting_time;
+        for(uint i=0; i<getCarlist[owner][p_identifier].length;i++) {
+            if(getCarlist[owner][p_identifier][i].plate_num == getPlatenum[lender]) {
+                start_time = getCarlist[owner][p_identifier][i].starting_time;
                 idxx = i;
                 break;
             }
         }
         if(pay(owner, idx, lender, start_time, end_time)) {
-            delete getCarlist[owner][idx][idxx];
+            delete getCarlist[owner][p_identifier][idxx];
             getPlace[owner][idx].remain++;
             getCurrentplace[lender] = address(0);
             getCurrentplacenum[lender] = 0;
@@ -203,7 +203,7 @@ contract Service {
         return ((time >= getPlace[owner][idx].available_hour_start) && (time <= getPlace[owner][idx].available_hour_end));
     }
     
-    function _check_bill(address owner, uint256 idx, uint256 starting_time, uint256 end_time) internal view returns (uint256) {
+    function _check_bill(address owner, uint256 idx, uint256 starting_time, uint256 end_time) public view returns (uint256) {
         // check the amount of fee that has to be payed
         // return price
         // fee per minute
@@ -211,7 +211,7 @@ contract Service {
         uint256 _fee = getPlace[owner][idx].fee;
         uint256 time = end_time - starting_time;
         if (time-time/100>=60) {
-            time = time+40;
+            time = time-40;
         }
         uint256 min_time = 60*(time/100)+(time-time/100);
         return _fee*min_time;
@@ -225,6 +225,7 @@ contract Service {
     function pay(address owner, uint256 idx, address lender, uint256 starting_time, uint256 end_time) public returns (bool){
         // pay for the price
         // return true or false
+        _approve(lender, owner, _check_bill(owner, idx, starting_time, end_time));
         return transferFrom(lender, owner, _check_bill(owner, idx, starting_time, end_time));
     }
 
@@ -236,7 +237,14 @@ contract Service {
         return getPlace[owner][idx].remain;
     }
 
-    function get_place_name(address owner, uint256 idx) public view returns (string memory) {
+    function get_place_name(address owner, uint256 p_identifier) public view returns (string memory) {
+        uint256 idx = 0;
+        for(uint i=0; i<getPlace[owner].length;i++) {
+            if(getPlace[owner][i].identifier == p_identifier) {
+                idx = i;
+                break;
+            }
+        }
         return getPlace[owner][idx].name;
     }
 
